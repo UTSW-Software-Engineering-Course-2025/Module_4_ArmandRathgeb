@@ -65,7 +65,7 @@ end
 
 membershipProbMat = zeros(N, K);
 for i = 1:K
-    membershipProbMat(:, i) = mvnpdf(x, mu(i), sigma2(i));
+    membershipProbMat(:, i) = mixtureProb(i) .* mvnpdf(x, mu(i), sigma2(i));
 end
 [~, idx] = sort(membershipProbMat, 2);
 labels = idx(:, K);
