@@ -207,6 +207,8 @@ for nid = 1:size(actmap, 1)
     saveas(f2, fullfile(outputDir, ['onlySpike_neuronTS_', num2str(nid), '.png']), 'png')
     saveas(f2, fullfile(outputDir, ['onlySpike_neuronTS_', num2str(nid), '.fig']), 'fig')
 
+    close(f2)
+
 end
 toc
 
@@ -232,6 +234,8 @@ for nid = 1:size(actmap, 1)
 
     saveas(f3, fullfile(outputDir, ['allStates_neuronTS_', num2str(nid), '.png']), 'png')
     saveas(f3, fullfile(outputDir, ['allStates_neuronTS_', num2str(nid), '.fig']), 'fig')
+
+    close(f3)
 
 end 
 

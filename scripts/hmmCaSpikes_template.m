@@ -82,9 +82,10 @@ for k = 1:maxIter
 
     avgGamma = mean(gammaMat(1:(T-1), :));
     for j = 1:M
-        for i = 1:M
-            tranPr_post(i, j) = mean( xiArr(:, i, j) ) / avgGamma(i);
-        end
+        %for i = 1:M
+        %    tranPr_post(i, j) = mean( xiArr(:, i, j) ) / avgGamma(i);
+        %end
+        tranPr_post(:, j) = mean(xiArr(:, :, j), 1) ./ avgGamma;
     end
 
     % weighted MLE
