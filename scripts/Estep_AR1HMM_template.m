@@ -47,7 +47,7 @@ if c(1) > 0
     alphaMat(1,:) = alphaMat(1,:) / c(1);
 end
 for t = 2:T
-     alphaMat(t, :) = sum(alphaMat(t-1, :) * tranPr, 2) .* bMat(t);
+     alphaMat(t, :) = sum(alphaMat(t-1, :) * tranPr, 2) .* bMat(t,:);
      c(t) = sum(alphaMat(t,:));
      if c(t) > 0
         alphaMat(t,:) = alphaMat(t,:) / c(t);
@@ -57,12 +57,9 @@ end
 
 %% beta_t(j) backward equation
 betaMat(T,:) = 1;
-d(T) = sum(betaMat(T,:));
-if d(T) > 0
-    betaMat(T,:) = betaMat(T,:) / d(T);
-end
+d(T) = 1;
 for t = (T-1):-1:1
-    betaMat(t, :) = sum(bMat(t,:) * tranPr, 2) .* betaMat(t+1,:);
+    betaMat(t, :) = sum(bMat(t+1,:) * tranPr, 2) .* betaMat(t+1,:);
     d(t) = sum(betaMat(t,:));
     if d(t) > 0
         betaMat(t,:) = betaMat(t,:) / d(t);
@@ -78,7 +75,8 @@ gammaMat = gammaMat ./ sum(gammaMat, 2); % P(x) = Sum_M alpha(i)beta(i)
 
 %% define xi_t(i,j)  
 for t = 1:T-1
-    xiArr(t,:,:) = betaMat(t+1, :)' * (alphaMat(t,:) * tranPr);
+    %xiArr(t,:,:) = betaMat(t+1, :)' * (alphaMat(t,:) * tranPr);
+    xiArr(t, :, :) = alphaMat(t,:)' * (bMat(t+1, :) .* betaMat(t+1, :)) .* tranPr;
 end
 xiArr = xiArr ./ sum(xiArr, [2,3]);
 

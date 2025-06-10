@@ -7,9 +7,11 @@ inputPath1 = "data";
 
 addpath(fullfile(inputPath0, "scripts"))
 
-outputPath1 = "output";
-outputDir = fullfile(inputPath0, outputPath1, "HMM_template");
-if ~isfolder(outputDir); mkdir(outputDir); end
+outputPath1 = fullfile(inputPath0, "output");
+outputDir1 = fullfile(outputPath1, "HMM_template");
+outputDir2 = fullfile(outputPath1, "HMM_expected");
+if ~isfolder(outputDir1); mkdir(outputDir1); end
+if ~isfolder(outputDir2); mkdir(outputDir2); end
 
 % Number of hidden states
 numStates = 5;
@@ -31,8 +33,8 @@ imagesc(actmap, [q(1), q(2)]), colormap(jet), colorbar
 
 %% saveas
 
-saveas(famap, fullfile(outputDir, 'actmap.png'), 'png')
-saveas(famap, fullfile(outputDir, 'actmap.fig'), 'fig')
+saveas(famap, fullfile(outputPath1, 'actmap.png'), 'png')
+saveas(famap, fullfile(outputPath1, 'actmap.fig'), 'fig')
 
 %% Output
 
@@ -143,13 +145,13 @@ toc
 
 %% save
 
-writematrix(hmm_statemap, fullfile(outputDir, 'hmm_statemap.csv'));
-writematrix(hmm_binarymap, fullfile(outputDir, 'hmm_binarymap.csv'));
-writematrix(hmm_logL, fullfile(outputDir, 'hmm_logL.csv'));
+writematrix(hmm_statemap, fullfile(outputPath1, 'hmm_statemap.csv'));
+writematrix(hmm_binarymap, fullfile(outputPath1, 'hmm_binarymap.csv'));
+writematrix(hmm_logL, fullfile(outputPath1, 'hmm_logL.csv'));
 
-writematrix(arhmm_coef_intercept, fullfile(outputDir, 'arhmm_coef_intercept.csv'));
-writematrix(arhmm_coef_AR1coef, fullfile(outputDir, 'arhmm_coef_AR1coef.csv'));
-writematrix(arhmm_coef_sigmasq, fullfile(outputDir, 'arhmm_coef_sigmasq.csv'));
+writematrix(arhmm_coef_intercept, fullfile(outputPath1, 'arhmm_coef_intercept.csv'));
+writematrix(arhmm_coef_AR1coef, fullfile(outputPath1, 'arhmm_coef_AR1coef.csv'));
+writematrix(arhmm_coef_sigmasq, fullfile(outputPath1, 'arhmm_coef_sigmasq.csv'));
 
 %% optimal num of hidden states selection step (skipped)
 % In this example, we can check if oneState_BIC > hmm_BIC or if K=5 is
@@ -177,14 +179,14 @@ h = imagesc(logical(tmpmap));
 colormap(gray), colorbar
 set(gca, 'YTick', []);
 
-saveas(fs3, fullfile(outputDir, 'hmm_binarymap0.png'), 'png')
-saveas(fs3, fullfile(outputDir, 'hmm_binarymap0.fig'), 'fig')
+saveas(fs3, fullfile(outputPath1, 'hmm_binarymap0.png'), 'png')
+saveas(fs3, fullfile(outputPath1, 'hmm_binarymap0.fig'), 'fig')
 
 %
-saveas(fs1, fullfile(outputDir, 'hmm_binarymap1.png'), 'png')
-saveas(fs1, fullfile(outputDir, 'hmm_binarymap1.fig'), 'fig')
-saveas(fs2, fullfile(outputDir, 'hmm_binarymap2.png'), 'png')
-saveas(fs2, fullfile(outputDir, 'hmm_binarymap2.fig'), 'fig')
+saveas(fs1, fullfile(outputPath1, 'hmm_binarymap1.png'), 'png')
+saveas(fs1, fullfile(outputPath1, 'hmm_binarymap1.fig'), 'fig')
+saveas(fs2, fullfile(outputPath1, 'hmm_binarymap2.png'), 'png')
+saveas(fs2, fullfile(outputPath1, 'hmm_binarymap2.fig'), 'fig')
 
 %% plot single TS
 % running time = ~2min
@@ -204,8 +206,8 @@ for nid = 1:size(actmap, 1)
     idx = find(fittedStates == s);
     scatter(idx, ca(idx), [], 'red');
 
-    saveas(f2, fullfile(outputDir, ['onlySpike_neuronTS_', num2str(nid), '.png']), 'png')
-    saveas(f2, fullfile(outputDir, ['onlySpike_neuronTS_', num2str(nid), '.fig']), 'fig')
+    saveas(f2, fullfile(outputDir1, ['onlySpike_neuronTS_', num2str(nid), '.png']), 'png')
+    saveas(f2, fullfile(outputDir1, ['onlySpike_neuronTS_', num2str(nid), '.fig']), 'fig')
 
     close(f2)
 
@@ -232,8 +234,8 @@ for nid = 1:size(actmap, 1)
     end
     legend([sc{:}], split(num2str(1:numStates)))
 
-    saveas(f3, fullfile(outputDir, ['allStates_neuronTS_', num2str(nid), '.png']), 'png')
-    saveas(f3, fullfile(outputDir, ['allStates_neuronTS_', num2str(nid), '.fig']), 'fig')
+    saveas(f3, fullfile(outputDir2, ['allStates_neuronTS_', num2str(nid), '.png']), 'png')
+    saveas(f3, fullfile(outputDir2, ['allStates_neuronTS_', num2str(nid), '.fig']), 'fig')
 
     close(f3)
 
