@@ -30,14 +30,14 @@ d = zeros(T, 1);              % normalizing scale factor for beta_t(i)
 
 %% pdf function values, b_i(x_t | x_(t-1))
 % No need for a for-loop here, just vectorize that part
-mu = phi0 + phi1 .* x1(:);
-sigma = sigmasq .^ .5;
-bMat = pdf('Normal', x(:), mu, sigma);
-%for i = 1:M
-%    mu = phi0(i) + phi1(i) * x1(:);
-%    sigma = ( sigmasq(i) )^0.5;
-%    bMat(:, i) = pdf('Normal', x(:), mu(:), sigma);
-%end
+%mu = phi0 + phi1 .* x1(:);
+%sigma = sigmasq .^ .5;
+%bMat = pdf('Normal', x(:), mu, sigma);
+for i = 1:M
+    mu = phi0(i) + phi1(i) * x1(:);
+    sigma = ( sigmasq(i) )^0.5;
+    bMat(:, i) = pdf('Normal', x(:), mu(:), sigma);
+end
 
 
 %% alpha_t(i) forward equation
@@ -47,7 +47,8 @@ if c(1) > 0
     alphaMat(1,:) = alphaMat(1,:) / c(1);
 end
 for t = 2:T
-     alphaMat(t, :) = sum(alphaMat(t-1, :) * tranPr, 2) .* bMat(t,:);
+     %alphaMat(t, :) = sum(alphaMat(t-1, :) * tranPr, 2) .* bMat(t,:);
+     alphaMat(t, :) = alphaMat(t-1, :) * tranPr .* bMat(t,:);
      c(t) = sum(alphaMat(t,:));
      if c(t) > 0
         alphaMat(t,:) = alphaMat(t,:) / c(t);
@@ -59,7 +60,8 @@ end
 betaMat(T,:) = 1;
 d(T) = 1;
 for t = (T-1):-1:1
-    betaMat(t, :) = sum(bMat(t+1,:) * tranPr, 2) .* betaMat(t+1,:);
+    %betaMat(t, :) = sum(bMat(t+1,:) * tranPr, 2) .* betaMat(t+1,:);
+    betaMat(t, :) = betaMat(t+1,:) .* betaMat(t+1,:) * tranPr';
     d(t) = sum(betaMat(t,:));
     if d(t) > 0
         betaMat(t,:) = betaMat(t,:) / d(t);

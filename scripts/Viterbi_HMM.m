@@ -21,13 +21,13 @@ deltaMat(1, :) = tmp / c(1);
 tmp = zeros(1, M);
 tmp2 = zeros(1, M);
 for t = 2:T
-    %tmp = deltaMat(t-1, :) * tranPr;
-    %[val, idx] = max(tmp);
+    tmp = deltaMat(t-1, :) * tranPr;
+    [val, idx] = max(tmp);
     for j = 1:M
-        for i = 1:M
-            tmp(i) = deltaMat(t-1, i) * tranPr(i, j);
-        end
-        [val, idx] = max(tmp);
+        %for i = 1:M
+        %    tmp(i) = deltaMat(t-1, i) * tranPr(i, j);
+        %end
+        %[val, idx] = max(tmp);
         Psi(t, j) = idx;        
         tmp2(j) = val * bMat(t, j);
     end
