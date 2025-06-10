@@ -23,7 +23,7 @@ alphaMat = zeros(T, M);
 betaMat = zeros(T, M);
 gammaMat = zeros(T, M);
 xiArr = zeros(T-1, M, M);
-%bMat = zeros(T, M); 
+bMat = zeros(T, M); 
 
 c = zeros(T, 1);              % normalizing scale factor for alpha_t(i)
 d = zeros(T, 1);              % normalizing scale factor for beta_t(i)
