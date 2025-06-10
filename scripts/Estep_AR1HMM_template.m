@@ -1,0 +1,70 @@
+function [c, gammaMat, xiArr] = ...
+            Estep_AR1HMM_template(x, x1, initPr, tranPr, phi0, phi1, sigmasq, T, M)
+% Estep_AR1HMM
+%
+% J Noh, 2025/02
+% Parameters:
+%   x: [T,1]: Cumulative summation over time f+ (post-Jordan decomposition)
+%   x1: [T,1]: Lagged time series data matrix from x.
+%   initPr: [1,M]: Initial state probabilities
+%   tranPr: [M,M]: Random transition probabilities
+%   phi0: [1,M]: AR(1) intercept for each state
+%   phi1: [1,M]: AR(1) coefficient for each state 
+%   sigmasq: [1,M]: AR(1) error variance for each state
+%   T: [1,1]: Number of time points
+%   M: [1,1]: Number of transition states - 1
+% Returns:
+%   c: [T,1]: Normalizing scale factor for alpha
+%   gammaMat: [T,M]: Marginal distribution of latent variables.
+%   xiArr: [T, M]: 
+
+%% Define objects
+alphaMat = zeros(T, M);
+betaMat = zeros(T, M);
+gammaMat = zeros(T, M);
+xiArr = zeros(T-1, M, M);
+%bMat = zeros(T, M); 
+
+c = zeros(T, 1);              % normalizing scale factor for alpha_t(i)
+d = zeros(T, 1);              % normalizing scale factor for beta_t(i)
+
+%% pdf function values, b_i(x_t | x_(t-1))
+% No need for a for-loop here, just vectorize that part
+mu = phi0 + phi1 .* x1(:);
+sigma = sigmasq .^ .5;
+bMat = pdf('Normal', x(:), mu, sigma);
+%for i = 1:M
+%    mu = phi0(i) + phi1(i) * x1(:);
+%    sigma = ( sigmasq(i) )^0.5;
+%    bMat(:, i) = pdf('Normal', x(:), mu(:), sigma);
+%end
+
+
+%% alpha_t(i) forward equation
+alphaMat(1,:) = initPr .* bMat(1, :);
+for t = 2:T
+     alphaMat(t, :) = sum(alphaMat(t-1, :) * tranPr, 2) .* bMat(t);
+end
+
+%% beta_t(j) backward equation
+betaMat(T,:) = 1;
+for t = (T-1):-1:1
+    betaMat(t, :) = sum(bMat(t,:) * tranPr, 2) .* betaMat(t+1,:);
+end
+
+%% define gamma_t(i) 
+%for t = 1:T
+%    gammaMat(t,:) = alphaMat(t,:) .* betaMat(t,:);
+%end
+gammaMat(:) = alphaMat .* betaMat;
+gammaMat = gammaMat ./ sum(gammaMat, 2); % P(x) = Sum_M alpha(i)beta(i)
+
+%disp(sum(gammaMat(1:5,:), 2)) % Look at these and make sure ==1
+
+%% define xi_t(i,j)  
+for t = 1:T-1
+    xiArr(t,:,:) = betaMat(t+1, :)' * (alphaMat(t,:) * tranPr);
+end
+xiArr = xiArr ./ sum(xiArr, [2,3]);
+
+end

@@ -7,6 +7,8 @@ inputPath1 = "/data/";
                                         
 %% Input
 
+addpath(fullfile(inputPath0, "scripts"))
+
 % .csv file with caclium activity time courses of 206 neurons
 inputfname = "actSig_HCLindexed.csv";
 
