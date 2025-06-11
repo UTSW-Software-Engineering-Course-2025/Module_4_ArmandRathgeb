@@ -74,19 +74,12 @@ for k = 1:maxIter
             Estep_AR1HMM_template(x, x1, initPr, tranPr, phi0, phi1, sigmasq, T, M);
     
     % M-step
-    tranPr_post = zeros(M, M);                          % initialize
-
     mu = mean( gammaMat .* x(:) ) ./ mean( gammaMat );
     mu1 = mean( gammaMat .* x1(:) ) ./ mean (gammaMat );
     initPr_post = gammaMat(1, :);
 
     avgGamma = mean(gammaMat(1:(T-1), :));
-    for j = 1:M
-        %for i = 1:M
-        %    tranPr_post(i, j) = mean( xiArr(:, i, j) ) / avgGamma(i);
-        %end
-        tranPr_post(:, j) = mean(xiArr(:, :, j), 1) ./ avgGamma;
-    end
+    tranPr_post = reshape(mean(xiArr, 1) ./avgGamma, [M,M]);
 
     % weighted MLE
     tmp1 = mean( gammaMat .* (x(:) - mu) .* (x1(:) - mu1) );
@@ -139,9 +132,9 @@ bMat = zeros(T, M);
 
 % pdf function values, b_i(x_t | x_(t-1))
 for i = 1:M
-    mu = phi0(i) + phi1(i) * yP1(:);
-    sigma = ( sigmasq(i) )^0.5;
-    bMat(:, i) = pdf('Normal', yP(:), mu(:), sigma);
+   mu = phi0(i) + phi1(i) * yP1(:);
+   sigma = ( sigmasq(i) )^0.5;
+   bMat(:, i) = pdf('Normal', yP(:), mu(:), sigma);
 end
 
 %tic
@@ -157,7 +150,7 @@ diffsP = diffs(indicP);
 tmp = nan(1, M);
 for i = 1:M
     subvec = diffsP(hmmS == i);
-    tmp(i) = nanmean(subvec);
+    tmp(i) = mean(subvec, 'omitnan');
 end 
 
 % to sort parameter vectors

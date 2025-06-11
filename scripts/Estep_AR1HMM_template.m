@@ -21,37 +21,28 @@ function [c, gammaMat, xiArr] = ...
 %% Define objects
 alphaMat = zeros(T, M);
 betaMat = zeros(T, M);
-gammaMat = zeros(T, M);
 xiArr = zeros(T-1, M, M);
-bMat = zeros(T, M); 
 
 c = zeros(T, 1);              % normalizing scale factor for alpha_t(i)
 d = zeros(T, 1);              % normalizing scale factor for beta_t(i)
 
 %% pdf function values, b_i(x_t | x_(t-1))
 % No need for a for-loop here, just vectorize that part
-%mu = phi0 + phi1 .* x1(:);
-%sigma = sigmasq .^ .5;
-%bMat = pdf('Normal', x(:), mu, sigma);
-for i = 1:M
-    mu = phi0(i) + phi1(i) * x1(:);
-    sigma = ( sigmasq(i) )^0.5;
-    bMat(:, i) = pdf('Normal', x(:), mu(:), sigma);
-end
-
+mu = phi0 + phi1 .* x1(:);
+sigma = sigmasq .^ .5;
+bMat = normpdf(x(:), mu, sigma);
 
 %% alpha_t(i) forward equation
 alphaMat(1,:) = initPr .* bMat(1, :);
 c(1) = sum(alphaMat(1,:));
 if c(1) > 0
-    alphaMat(1,:) = alphaMat(1,:) / c(1);
+    alphaMat(1,:) = alphaMat(1,:) ./ c(1);
 end
 for t = 2:T
-     %alphaMat(t, :) = sum(alphaMat(t-1, :) * tranPr, 2) .* bMat(t,:);
      alphaMat(t, :) = alphaMat(t-1, :) * tranPr .* bMat(t,:);
      c(t) = sum(alphaMat(t,:));
      if c(t) > 0
-        alphaMat(t,:) = alphaMat(t,:) / c(t);
+        alphaMat(t,:) = alphaMat(t,:) ./ c(t);
      end
 end
 %disp(alphaMat(1:10,:))
@@ -60,25 +51,24 @@ end
 betaMat(T,:) = 1;
 d(T) = 1;
 for t = (T-1):-1:1
-    %betaMat(t, :) = sum(bMat(t+1,:) * tranPr, 2) .* betaMat(t+1,:);
     betaMat(t, :) = betaMat(t+1,:) .* betaMat(t+1,:) * tranPr';
     d(t) = sum(betaMat(t,:));
     if d(t) > 0
-        betaMat(t,:) = betaMat(t,:) / d(t);
+        betaMat(t,:) = betaMat(t,:) ./ d(t);
     end
 end
 %disp(betaMat(1:10,:))
 
 %% define gamma_t(i) 
-gammaMat(:) = alphaMat .* betaMat;
+gammaMat = alphaMat .* betaMat;
 gammaMat = gammaMat ./ sum(gammaMat, 2); % P(x) = Sum_M alpha(i)beta(i)
 
-%disp(sum(gammaMat(1:5,:), 2)) % Look at these and make sure ==1
 
 %% define xi_t(i,j)  
+%bM = bMat(2:T, :) .* betaMat(2:T, :);
 for t = 1:T-1
-    %xiArr(t,:,:) = betaMat(t+1, :)' * (alphaMat(t,:) * tranPr);
     xiArr(t, :, :) = alphaMat(t,:)' * (bMat(t+1, :) .* betaMat(t+1, :)) .* tranPr;
+    %xiArr(t,:,:) = alphaMat(t,:)' * bM(t, :) .* tranPr;
 end
 xiArr = xiArr ./ sum(xiArr, [2,3]);
 

@@ -143,7 +143,7 @@ for nid = 1:size(actmap, 1)
 end
 toc
 
-%% save
+% %% save
 
 writematrix(hmm_statemap, fullfile(outputPath1, 'hmm_statemap.csv'));
 writematrix(hmm_binarymap, fullfile(outputPath1, 'hmm_binarymap.csv'));
@@ -218,7 +218,7 @@ toc
 % running time = ~2min
 
 for nid = 1:size(actmap, 1)
-    
+
     ca = actmap(nid, :);
     fittedStates = hmm_statemap(nid, :);
 
@@ -241,4 +241,4 @@ for nid = 1:size(actmap, 1)
 
 end 
 
-%% EOF
+% EOF
